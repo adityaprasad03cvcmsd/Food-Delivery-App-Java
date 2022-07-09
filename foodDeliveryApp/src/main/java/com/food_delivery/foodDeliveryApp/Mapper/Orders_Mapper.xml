@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.food_delivery.foodDeliveryApp.Mapper.Orders_Mapper">
+
+	<resultMap type="orders" id="orders">
+		<id property="order_id" column="order_id" />
+
+		<association property="user_id" column="user_id">
+			<id property="user_id" column="user_id" />
+			<result property="full_name" column="full_name" />
+			<result property="mobile_number" column="mobile_number" />
+			<result property="email" column="email" />
+			<result property="password" column="password" />
+		</association>
+
+		<!-- <association property="food_id" column="food">
+			<id property="food_id" column="food_id" />
+			<result property="category" column="category" />
+			<result property="cat" column="cat" />
+			<result property="image" column="image" />
+			<result property="name" column="name" />
+			<result property="price" column="price" />
+			<result property="s_desc" column="s_desc" />
+			<result property="description" column="description" />
+		</association> -->
+		<collection property="food_id" column="food_id" ofType="food">
+			<id property="food_id" column="food_id" />
+			<result property="category" column="category" />
+			<result property="cat" column="cat" />
+			<result property="image" column="image" />
+			<result property="name" column="name" />
+			<result property="price" column="price" />
+			<result property="s_desc" column="s_desc" />
+			<result property="description" column="description" />
+		</collection>
+		
+		<result property="list_id" column="list_id"/>
+
+	</resultMap>
+
+	<select id="getAllOrders" resultType="orders" resultMap="orders">
+		SELECT
+		orders.order_id , users.user_id, users.full_name, users.mobile_number,
+		users.email,
+		food_categories.food_id, food_categories.category,
+		food_categories.cat, food_categories.image, food_categories.name,
+		food_categories.price, food_categories.s_desc,
+		food_categories.description FROM orders INNER JOIN
+		users ON
+		orders.user_id=users.user_id INNER JOIN food_categories ON
+		orders.food_id=food_categories.food_id GROUP BY list_id
+	</select>
+
+	<select id="getOrder" resultType="orders" resultMap="orders">
+		SELECT
+		orders.order_id , users.user_id, users.full_name, users.mobile_number,
+		users.email,
+		food_categories.food_id, food_categories.category,
+		food_categories.cat, food_categories.image, food_categories.name,
+		food_categories.price, food_categories.s_desc,
+		food_categories.description FROM orders 
+		LEFT JOIN users ON orders.user_id=users.user_id 
+		LEFT JOIN food_categories ON orders.food_id=food_categories.food_id 
+		WHERE list_id=#{list_id}
+	</select>
+
+	<insert id="addOrder">
+		INSERT INTO orders (order_id,user_id,food_id) VALUES
+		(#{order_id},
+		#{user_id}, #{food_id})
+	</insert>
+
+	<delete id="deleteOrder">
+		DELETE FROM orders WHERE order_id=#{order_id}
+	</delete>
+</mapper>
